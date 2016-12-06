@@ -1,0 +1,12 @@
+menüsor
+új játék
+kilépés
+beállítások
+
+3 nehézségi fok
+játék közben beállítások letiltva
+
+9x20-as játéktér
+
+irányítás nyilak+space
+

@@ -140,6 +140,7 @@ public class TetrisWindow implements KeyListener {
         optionsMenu.setEnabled(false);
         newGame.setEnabled(false);
         gameTask = new GameTask();
+        gameTask.setGameOver(false);
         gameTask.startRendering(tetris, this, gameField, fieldRenderer);
     }
 

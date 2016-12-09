@@ -18,8 +18,9 @@ public class TetrisWindow implements KeyListener {
     URL iconURL = getClass().getResource("icon.png");
     ImageIcon icon = new ImageIcon(iconURL);
     FieldRenderer fieldRenderer;
-    GameField gameField;
+    GameField gameField = new GameField();
     Tetris tetris;
+    GameTask gameTask = new GameTask();
 
     public TetrisWindow(Tetris tetris) {
         this.tetris = tetris;
@@ -138,7 +139,8 @@ public class TetrisWindow implements KeyListener {
         tetris.setGameStarted(true);
         optionsMenu.setEnabled(false);
         newGame.setEnabled(false);
-        fieldRenderer.startRendering();
+        gameTask = new GameTask();
+        gameTask.startRendering(tetris, this, gameField, fieldRenderer);
     }
 
     @Override

@@ -11,8 +11,8 @@ public class Block {
     public Block(int x, int y, Color color1, Color color2) {
         this.x = x;
         this.y = y;
-        this.fieldX = x + 5;
-        this.fieldY = y + 1;
+        this.fieldX = x;
+        this.fieldY = y;
         this.color1 = color1;
         this.color2 = color2;
     }

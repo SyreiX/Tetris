@@ -3,16 +3,16 @@ package Tetris;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.Timer;
 
 public class FieldRenderer extends TimerTask {
 
     Tetris tetris;
     TetrisWindow tetrisWindow;
     GameField gameField;
-    Timer timer = new Timer();
+    private Timer timer;
+    private boolean gameOver = false;
     Block[][] playField;
-    List currentElement;
+    List<Block> currentElement;
     Graphics2D gr;
     int diffLevel;
     int score = 0;
@@ -32,15 +32,30 @@ public class FieldRenderer extends TimerTask {
     }
 
     public void startRendering() {
+        timer = new Timer();
+        timer.purge();
         timer.scheduleAtFixedRate(this, TetrisWindow.getDelay(), diffLevel);
     }
 
     public void createNewElement() {
-        Elements elements = new Elements();
-        this.currentElement = elements.getRandomElement();
-        for(int i = 0; i < 4; i++) {
-            ((Block) (this.currentElement.get(i))).setFieldX(((Block) (currentElement.get(i))).getX() + 4);
-            ((Block) (this.currentElement.get(i))).setFieldY(((Block) (currentElement.get(i))).getY() + 1);
+        if(!gameOver) {
+            Elements elements = new Elements();
+            this.currentElement = elements.getRandomElement();
+            for(int i = 0; i < 4; i++) {
+                Block currentBlock = this.currentElement.get(i);
+                currentBlock.setFieldX(currentBlock.getX() + 4);
+                currentBlock.setFieldY(currentBlock.getY());
+            }
+            for(int i = 0; i < 4; i++) {
+                if(playField[currentElement.get(i).getFieldY()][currentElement.get(i).getFieldX()] != null) {
+                    tetrisWindow.gameOverMessage("You lose!", "Game Over");
+                    gameOver = true;
+                    this.timer.cancel();
+                    this.timer.purge();
+                    tetris.setGameStarted(false);
+                    break;
+                }
+            }
         }
     }
 
@@ -50,62 +65,65 @@ public class FieldRenderer extends TimerTask {
 
     public void run() {
         try {
-//            tetrisWindow.setRunning(true);
-//            while(tetrisWindow.isRunning()){
-            int placeable = 0;
-            if(Tetris.getElementPlaced()) {
-                createNewElement();
-                Tetris.setElementPlaced(false);
-            } else {
-                this.currentElement = gameField.currentElement;
-                if(currentElement.size() > 0) {
-                    for(int i = 0; i < 4; i++) {
-                        int iX = ((Block) (currentElement.get(i))).getFieldX();
-                        int iY = ((Block) (currentElement.get(i))).getFieldY();
+            if(!gameOver) {
+                int placeable = 0;
+                if(Tetris.getElementPlaced()) {
+                    createNewElement();
+                    Tetris.setElementPlaced(false);
+                } else {
+                    this.currentElement = gameField.currentElement;
+                    if(currentElement.size() > 0) {
+                        for(int i = 0; i < 4; i++) {
+                            int iX = ((currentElement.get(i))).getFieldX();
+                            int iY = ((currentElement.get(i))).getFieldY();
 
-                        if(iY + 1 < playField.length) {
-                            if(playField[iY + 1][iX] == null) {
-                                placeable++;
+                            if(iY + 1 < playField.length) {
+                                if(playField[iY + 1][iX] == null) {
+                                    placeable++;
+                                }
+                            } else {
+                                Tetris.setElementPlaced(true);
+                                break;
+                            }
+                        }
+                        if(placeable == 4 && !Tetris.getElementPlaced()) {
+                            for(int i = 0; i < 4; i++) {
+                                ((currentElement.get(i))).setFieldY(((currentElement.get(i))).getFieldY() + 1);
                             }
                         } else {
                             Tetris.setElementPlaced(true);
-                            break;
+                            for(int i = 0; i < 4; i++) {
+                                int iX = ((currentElement.get(i))).getFieldX();
+                                int iY = ((currentElement.get(i))).getFieldY();
+                                playField[iY][iX] = currentElement.get(i);
+                            }
                         }
-                    }
-                    if(placeable == 4 && !Tetris.getElementPlaced()) {
-                        for(int i = 0; i < 4; i++) {
-                            ((Block) (currentElement.get(i))).setFieldY(((Block) (currentElement.get(i))).getFieldY() + 1);
+                        if(Tetris.getElementPlaced()) {
+                            findRowToClear();
+                            findRowToClear();
+                            findRowToClear();
+                            currentElement.clear();
+                            gameField.repaint();
                         }
-                    } else {
-                        Tetris.setElementPlaced(true);
-                        for(int i = 0; i < 4; i++) {
-                            int iX = ((Block) (currentElement.get(i))).getFieldX();
-                            int iY = ((Block) (currentElement.get(i))).getFieldY();
-                            playField[iY][iX] = (Block) currentElement.get(i);
-                        }
-                    }
-                    if(Tetris.getElementPlaced()) {
-                        findRowToClear();
-                        findRowToClear();
-                        currentElement.clear();
-                        gameField.repaint();
                     }
                 }
-
+                if(!gameOver) {
+                    gameField.repaint();
+                }
             }
-            gameField.repaint();
-//            }
         } catch(NullPointerException e) {
             System.err.println("kamu   " + e);
+            e.printStackTrace();
         }
+        timer.purge();
     }
 
     public void moveElement(int direction) {
         if(currentElement.size() != 0) {
             int placeable = 0;
             for(int i = 0; i < 4; i++) {
-                int iX = ((Block) (currentElement.get(i))).getFieldX();
-                int iY = ((Block) (currentElement.get(i))).getFieldY();
+                int iX = ((currentElement.get(i))).getFieldX();
+                int iY = ((currentElement.get(i))).getFieldY();
 
                 if(iX + direction < playField[0].length && iX + direction >= 0) {
                     if(playField[iY][iX + direction] == null) {
@@ -117,7 +135,7 @@ public class FieldRenderer extends TimerTask {
             }
             if(placeable == 4 && !Tetris.getElementPlaced()) {
                 for(int i = 0; i < 4; i++) {
-                    ((Block) (currentElement.get(i))).setFieldX(((Block) (currentElement.get(i))).getFieldX() + direction);
+                    ((currentElement.get(i))).setFieldX(((currentElement.get(i))).getFieldX() + direction);
                 }
             }
         }
@@ -128,8 +146,8 @@ public class FieldRenderer extends TimerTask {
             try {
                 int placeable = 0;
                 for(int i = 0; i < 4; i++) {
-                    int iX = ((Block) (currentElement.get(i))).getFieldX();
-                    int iY = ((Block) (currentElement.get(i))).getFieldY();
+                    int iX = ((currentElement.get(i))).getFieldX();
+                    int iY = ((currentElement.get(i))).getFieldY();
 
                     if(iY + 1 < playField.length) {
                         if(playField[iY + 1][iX] == null) {
@@ -141,48 +159,49 @@ public class FieldRenderer extends TimerTask {
                 }
                 if(placeable == 4 && !Tetris.getElementPlaced()) {
                     for(int i = 0; i < 4; i++) {
-                        ((Block) (currentElement.get(i))).setFieldY(((Block) (currentElement.get(i))).getFieldY() + 1);
+                        ((currentElement.get(i))).setFieldY(((currentElement.get(i))).getFieldY() + 1);
                     }
                 }
             } catch(NullPointerException e) {
-                System.err.println("finomság  " + e);
+                e.printStackTrace();
             }
         }
     }
 
     public void rotateElement() {
-//        try {
-        int xPos = ((Block) (currentElement.get(0))).getFieldX();
-        int yPos = ((Block) (currentElement.get(0))).getFieldY();
+        Block currentBlock = currentElement.get(0);
+        int xPos = currentBlock.getFieldX();
+        int yPos = currentBlock.getFieldY();
 
         boolean rotatable = true;
         for(int i = 1; i < 4; i++) {
-            int iX = ((Block) (currentElement.get(i))).getFieldX() - xPos;
-            int iY = ((Block) (currentElement.get(i))).getFieldY() - yPos;
+            currentBlock = currentElement.get(i);
+            int iX = currentBlock.getFieldX() - xPos;
+            int iY = currentBlock.getFieldY() - yPos;
 
-            if(!((((iX + yPos) >= 0) && ((iX + yPos) < 15)) && ((((iY * (-1)) + xPos) >= 0) && ((iY * (-1)) + xPos) < 9))) {
-                if(playField[iX + yPos][(iY * (-1)) + xPos] != null) {
-                    rotatable = false;
-                }
+            int rotX = (iY * (-1)) + xPos;
+            int rotY = iX + yPos;
+
+            if(rotX < 0 || rotX > 8 || rotY < 0 || rotY > 14 || playField[rotY][rotX] != null) {
+                rotatable = false;
+                break;
             }
         }
 
         if(rotatable) {
             int temp;
             for(int i = 1; i < 4; i++) {
-                int iX = ((Block) (currentElement.get(i))).getFieldX() - xPos;
-                int iY = ((Block) (currentElement.get(i))).getFieldY() - yPos;
+                currentBlock = currentElement.get(i);
+                int iX = currentBlock.getFieldX() - xPos;
+                int iY = currentBlock.getFieldY() - yPos;
 
                 temp = iX;
                 iX = iY * (-1);
                 iY = temp;
-                ((Block) (currentElement.get(i))).setFieldX(iX + xPos);
-                ((Block) (currentElement.get(i))).setFieldY(iY + yPos);
+                currentBlock.setFieldX(iX + xPos);
+                currentBlock.setFieldY(iY + yPos);
             }
         }
-//        } catch(IndexOutOfBoundsException e) {
-//            System.err.println("forgatási probléma");
-//        }
     }
 
     public void findRowToClear() {
@@ -233,5 +252,13 @@ public class FieldRenderer extends TimerTask {
             TetrisWindow.score.setText(Integer.toString(score));
         }
     }
-}
 
+    public void clearEverything() {
+        currentElement.clear();
+        for(int i = 0; i < playField.length; i++) {
+            for(int j = 0; j < playField[0].length; j++) {
+                playField[i][j] = null;
+            }
+        }
+    }
+}

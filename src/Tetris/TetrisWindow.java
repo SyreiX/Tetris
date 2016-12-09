@@ -11,21 +11,21 @@ import java.net.URL;
 public class TetrisWindow implements KeyListener {
 
     private JFrame f;
+    private JMenuItem newGame;
+    private JMenu optionsMenu;
     public static JTextField score = new JTextField();
-    private static int diffLevel = 500;
+    private static int diffLevel = 50;
     URL iconURL = getClass().getResource("icon.png");
     ImageIcon icon = new ImageIcon(iconURL);
     FieldRenderer fieldRenderer;
     GameField gameField;
     Tetris tetris;
-    private boolean isRunning;
 
     public TetrisWindow(Tetris tetris) {
         this.tetris = tetris;
         this.gameField = new GameField();
         fieldRenderer = new FieldRenderer(this.tetris, this, this.gameField);
         gameField.setFieldRenderer(fieldRenderer);
-        this.isRunning = false;
     }
 
     public void setDiffLevel(int diffLevel) {
@@ -50,9 +50,9 @@ public class TetrisWindow implements KeyListener {
         f.addKeyListener(this);
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
-        final JMenuItem newGame = new JMenuItem("New Game");
+        newGame = new JMenuItem("New Game   F2");
         JMenuItem quitGame = new JMenuItem("Quit");
-        final JMenu optionsMenu = new JMenu("Options");
+        optionsMenu = new JMenu("Options");
         final JMenuItem difficulty = new JMenuItem("Difficulty");
         menuBar.setBackground(Color.lightGray);
         score.setHorizontalAlignment(JTextField.RIGHT);
@@ -69,21 +69,19 @@ public class TetrisWindow implements KeyListener {
         menuBar.add(score);
         f.setJMenuBar(menuBar);
         f.pack();
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        f.setLocation(dim.width / 2 - f.getSize().width / 2, dim.height / 2 - f.getSize().height / 2);
         f.setVisible(true);
 
         newGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                tetris.setGameStarted(true);
-                optionsMenu.setEnabled(false);
-                newGame.setEnabled(false);
-                fieldRenderer.startRendering();
+                startNewGame();
             }
         });
 
         quitGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 //                System.exit(0);
-                isRunning = false;
             }
         });
 
@@ -135,6 +133,14 @@ public class TetrisWindow implements KeyListener {
         return f;
     }
 
+    private void startNewGame() {
+        fieldRenderer.clearEverything();
+        tetris.setGameStarted(true);
+        optionsMenu.setEnabled(false);
+        newGame.setEnabled(false);
+        fieldRenderer.startRendering();
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -151,7 +157,7 @@ public class TetrisWindow implements KeyListener {
                 f.repaint();
             } else if(e.getKeyCode() == KeyEvent.VK_UP) {
                 if(fieldRenderer.currentElement.size() != 0) {
-                    if(((Block) (fieldRenderer.currentElement.get(0))).getColor1() != Color.YELLOW) {
+                    if(((fieldRenderer.currentElement.get(0))).getColor1() != Color.YELLOW) {
                         fieldRenderer.rotateElement();
                         f.repaint();
                     }
@@ -159,6 +165,10 @@ public class TetrisWindow implements KeyListener {
             } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
                 fieldRenderer.fallOneRow();
                 f.repaint();
+            }
+        } else {
+            if(e.getKeyCode() == KeyEvent.VK_F2) {
+                startNewGame();
             }
         }
     }
@@ -168,11 +178,10 @@ public class TetrisWindow implements KeyListener {
 
     }
 
-    public boolean isRunning(){
-        return this.isRunning;
-    }
-
-    public void setRunning(boolean isRun){
-        this.isRunning = isRun;
+    public void gameOverMessage(String infoMessage, String titleBar) {
+        JOptionPane.showConfirmDialog(null, infoMessage, titleBar, JOptionPane.PLAIN_MESSAGE);
+        fieldRenderer.clearEverything();
+        newGame.setEnabled(true);
+        gameField.repaint();
     }
 }

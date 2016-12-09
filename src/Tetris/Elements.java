@@ -17,9 +17,9 @@ public class Elements {
 
     {
         I.add(new Block(0, 0, Color.CYAN, new Color(145, 237, 243)));
-        I.add(new Block(0, 1, Color.CYAN, new Color(145, 237, 243)));
-        I.add(new Block(0, -1, Color.CYAN, new Color(145, 237, 243)));
-        I.add(new Block(0, 2, Color.CYAN, new Color(145, 237, 243)));
+        I.add(new Block(1, 0, Color.CYAN, new Color(145, 237, 243)));
+        I.add(new Block(-1, 0, Color.CYAN, new Color(145, 237, 243)));
+        I.add(new Block(2, 0, Color.CYAN, new Color(145, 237, 243)));
 
         L.add(new Block(0, 0, Color.BLUE, new Color(79, 127, 240)));
         L.add(new Block(1, 0, Color.BLUE, new Color(79, 127, 240)));

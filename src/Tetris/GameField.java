@@ -52,13 +52,11 @@ public class GameField extends JComponent {
         }
 
         currentElement = fieldRenderer.getCurrentElement();
-//        if(currentElement.size() > 0) {
-            for(int i = 0; i < currentElement.size(); i++) {
-                g2d.setColor(currentElement.get(i).getColor1());
-                g2d.fillRoundRect(currentElement.get(i).getFieldX() * 40 + 2, currentElement.get(i).getFieldY() * 40 + 2, 37, 37, 15, 15);
-                g2d.setColor(currentElement.get(i).getColor2());
-                g2d.fillRoundRect(currentElement.get(i).getFieldX() * 40 + 4, currentElement.get(i).getFieldY() * 40 + 4, 28, 28, 15, 15);
-            }
-//        }
+        for(int i = 0; i < currentElement.size(); i++) {
+            g2d.setColor(currentElement.get(i).getColor1());
+            g2d.fillRoundRect(currentElement.get(i).getFieldX() * 40 + 2, currentElement.get(i).getFieldY() * 40 + 2, 37, 37, 15, 15);
+            g2d.setColor(currentElement.get(i).getColor2());
+            g2d.fillRoundRect(currentElement.get(i).getFieldX() * 40 + 4, currentElement.get(i).getFieldY() * 40 + 4, 28, 28, 15, 15);
+        }
     }
 }

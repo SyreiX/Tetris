@@ -14,7 +14,7 @@ public class TetrisWindow implements KeyListener {
     private JMenuItem newGame;
     private JMenu optionsMenu;
     public static JTextField score = new JTextField();
-    private static int diffLevel = 50;
+    private static int diffLevel = 400;
     URL iconURL = getClass().getResource("icon.png");
     ImageIcon icon = new ImageIcon(iconURL);
     FieldRenderer fieldRenderer;
@@ -168,6 +168,10 @@ public class TetrisWindow implements KeyListener {
             } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
                 fieldRenderer.fallOneRow();
                 f.repaint();
+            } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+                while(!Tetris.getElementPlaced()) {
+                    fieldRenderer.fallOneRow();
+                }
             }
         } else {
             if(e.getKeyCode() == KeyEvent.VK_F2) {

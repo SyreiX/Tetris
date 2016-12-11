@@ -14,7 +14,7 @@ public class TetrisWindow implements KeyListener {
     private JMenuItem newGame;
     private JMenu optionsMenu;
     public static JTextField score = new JTextField();
-    private static int diffLevel = 400;
+    private static int diffLevel = 100;
     URL iconURL = getClass().getResource("icon.png");
     ImageIcon icon = new ImageIcon(iconURL);
     FieldRenderer fieldRenderer;
@@ -123,11 +123,11 @@ public class TetrisWindow implements KeyListener {
 
                 JOptionPane.showMessageDialog(null, diff, "Choose difficulty!", JOptionPane.PLAIN_MESSAGE);
                 if(button1.isSelected()) {
-                    setDiffLevel(1000);
+                    setDiffLevel(600);
                 } else if(button2.isSelected()) {
-                    setDiffLevel(750);
+                    setDiffLevel(400);
                 } else {
-                    setDiffLevel(500);
+                    setDiffLevel(200);
                 }
             }
         });
@@ -169,7 +169,7 @@ public class TetrisWindow implements KeyListener {
                 fieldRenderer.fallOneRow();
                 f.repaint();
             } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                while(!Tetris.getElementPlaced()) {
+                while(!Tetris.getElementPlaced() && fieldRenderer.currentElement.size() != 0) {
                     fieldRenderer.fallOneRow();
                 }
             }
@@ -189,6 +189,7 @@ public class TetrisWindow implements KeyListener {
         JOptionPane.showConfirmDialog(null, infoMessage, titleBar, JOptionPane.PLAIN_MESSAGE);
         fieldRenderer.clearEverything();
         newGame.setEnabled(true);
+        optionsMenu.setEnabled(true);
         gameField.repaint();
     }
 }

@@ -25,7 +25,6 @@ public class FieldRenderer {
         this.gr = gr;
     }
 
-
     public List<Block> getCurrentElement() {
         return currentElement;
     }
@@ -54,8 +53,8 @@ public class FieldRenderer {
     }
 
     public void fallOneRow() {
-        if(currentElement.size() != 0) {
-            try {
+        try {
+            if(currentElement.size() == 4 && !Tetris.getElementPlaced()) {
                 int placeable = 0;
                 for(int i = 0; i < 4; i++) {
                     int iX = ((currentElement.get(i))).getFieldX();
@@ -74,9 +73,10 @@ public class FieldRenderer {
                         ((currentElement.get(i))).setFieldY(((currentElement.get(i))).getFieldY() + 1);
                     }
                 }
-            } catch(NullPointerException e) {
-                e.printStackTrace();
             }
+
+        } catch(NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
